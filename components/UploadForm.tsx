@@ -8,6 +8,7 @@ import { Upload, ImageIcon } from 'lucide-react';
 import { UploadSchema } from '@/lib/zod';
 import { ACCEPTED_IMAGE_TYPES, ACCEPTED_PDF_TYPES } from '@/lib/constants';
 import { BookUploadFormValues } from '@/types';
+import {toast} from 'sonner';
 
 import {
   Form,
@@ -38,7 +39,12 @@ const UploadForm = () => {
   });
 
   const onSubmit = async (values: BookUploadFormValues) => {
-    setIsSubmitting(true);
+      if(!userId) {
+          return toast.error("Please login to upload books");
+      }
+
+
+      setIsSubmitting(true);
 
     try {
       await new Promise((resolve) => setTimeout(resolve, 1000));
