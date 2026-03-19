@@ -1,27 +1,29 @@
-import HeroSection from "@/components/HeroSection";
-import BookCard from "@/components/BookCard";
-import { sampleBooks } from "@/lib/constants";
+import React from 'react'
+import HeroSection from '@/components/HeroSection';
+import BookCard from '@/components/BookCard';
+import { getAllBooks } from '@/lib/actions/book.actions';
 
-const Page = () => {
-  return (
-    <main className="page-shell">
-      <section className="mx-auto flex w-full max-w-[1180px] flex-col px-5">
-        <HeroSection />
+const Page = async () => {
+    const bookResults = await getAllBooks()
+    const books = bookResults.success ? bookResults.data ?? [] : []
 
-        <div className="library-books-grid w-full">
-          {sampleBooks.map((book) => (
-            <BookCard
-              key={book._id}
-              title={book.title}
-              author={book.author}
-              coverURL={book.coverURL}
-              slug={book.slug}
-            />
-          ))}
-        </div>
-      </section>
-    </main>
-  );
-};
+    return (
+        <main className="wrapper container">
+            <HeroSection />
 
-export default Page;
+            <div className="library-books-grid">
+                {books.map((book) => (
+                    <BookCard
+                        key={book._id}
+                        title={book.title}
+                        author={book.author}
+                        coverURL={book.coverURL}
+                        slug={book.slug}
+                    />
+                ))}
+            </div>
+        </main>
+    )
+}
+
+export default Page

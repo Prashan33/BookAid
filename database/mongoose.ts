@@ -1,8 +1,8 @@
 import mongoose from 'mongoose';
 
-const MONGODB_URI = process.env.MONGODB_URI;
+const MONGODB_URI = process.env.MONGODB_URI || process.env.MONGODB_URL;
 
-if (!MONGODB_URI) throw new Error('Please provide a valid MONGODB_URI');
+if (!MONGODB_URI) throw new Error('Please provide a valid MONGODB_URI or MONGODB_URL');
 
 declare global {
     var mongooseCache: {

@@ -4,6 +4,7 @@ import { IBM_Plex_Serif, Mona_Sans, Geist } from "next/font/google";
 
 import "./globals.css";
 import Navbar from "@/components/Navbar";
+import { Toaster } from "@/components/ui/sonner";
 import { cn } from "@/lib/utils";
 
 const geist = Geist({subsets:['latin'],variable:'--font-sans'});
@@ -33,12 +34,14 @@ export default function RootLayout({
   return (
     <html lang="en" className={cn("font-sans", geist.variable)}>
       <body
+        suppressHydrationWarning
         className={`${ibmPlexSerif.variable} ${monaSans.variable} relative font-sans antialiased`}
       >
         <ClerkProvider>
           <Navbar />
           {children}
         </ClerkProvider>
+      <Toaster/>
       </body>
     </html>
   );
