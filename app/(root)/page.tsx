@@ -4,11 +4,11 @@ import { sampleBooks } from "@/lib/constants";
 
 const Page = () => {
   return (
-    <main className="container">
-      <section className="wrapper">
+    <main className="page-shell">
+      <section className="mx-auto flex w-full max-w-[1180px] flex-col px-5">
         <HeroSection />
 
-        <div className="library-books-grid">
+        <div className="library-books-grid w-full">
           {sampleBooks.map((book) => (
             <BookCard
               key={book._id}

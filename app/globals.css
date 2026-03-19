@@ -180,8 +180,8 @@
   .wrapper {
     @apply max-w-7xl px-5 mx-auto w-full;
   }
-  .container {
-    @apply pt-[94px] pb-18 min-h-screen;
+  .page-shell {
+    @apply w-full pt-[126px] pb-18 min-h-screen;
   }
   .navItem {
     @apply px-1 sm:px-3 text-sm sm:text-base font-medium flex items-center cursor-pointer text-[var(--text-primary)];
@@ -554,7 +554,7 @@
     @apply flex-1 py-2 px-4 outline-none text-[var(--text-primary)] placeholder:text-[var(--text-muted)];
   }
   .library-books-grid {
-    @apply grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-x-3 md:gap-x-10 gap-y-7 md:gap-y-9;
+    @apply grid w-full grid-cols-2 justify-items-center md:grid-cols-3 lg:grid-cols-5 gap-x-4 md:gap-x-8 lg:gap-x-10 gap-y-7 md:gap-y-9 mx-auto;
   }
   .library-empty-card {
     @apply bg-[var(--bg-secondary)] rounded-[14px] p-12 max-w-md mx-auto;
