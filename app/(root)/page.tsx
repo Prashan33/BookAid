@@ -3,12 +3,15 @@ import HeroSection from '@/components/HeroSection';
 import BookCard from '@/components/BookCard';
 import { getAllBooks } from '@/lib/actions/book.actions';
 
+export const dynamic = 'force-dynamic';
+
 const Page = async () => {
     const bookResults = await getAllBooks()
     const books = bookResults.success ? bookResults.data ?? [] : []
 
     return (
-        <main className="wrapper container">
+        <main className="page-shell">
+            <section className="mx-auto mt-8 flex w-full max-w-[1180px] flex-col px-5">
             <HeroSection />
 
             <div className="library-books-grid">
@@ -22,6 +25,7 @@ const Page = async () => {
                     />
                 ))}
             </div>
+            </section>
         </main>
     )
 }

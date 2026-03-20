@@ -50,6 +50,9 @@
 }
 
 :root {
+  --font-sans: "Avenir Next", "Segoe UI", Helvetica, Arial, sans-serif;
+  --font-ibm-plex-serif: Georgia, "Times New Roman", serif;
+  --font-mona-sans: "Avenir Next", "Segoe UI", Helvetica, Arial, sans-serif;
   --radius: 0.625rem;
 
   /* Warm Literary Backgrounds */
@@ -181,7 +184,7 @@
     @apply max-w-7xl px-5 mx-auto w-full;
   }
   .page-shell {
-    @apply w-full pt-[126px] pb-18 min-h-screen;
+    @apply w-full pt-[158px] pb-18 min-h-screen;
   }
   .navItem {
     @apply px-1 sm:px-3 text-sm sm:text-base font-medium flex items-center cursor-pointer text-[var(--text-primary)];
