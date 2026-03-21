@@ -414,16 +414,16 @@
     @apply absolute -bottom-1 -right-1 sm:-bottom-2 sm:-right-2;
   }
   .vapi-pulse-ring {
-    @apply absolute inset-0 w-[50px] h-[50px] sm:w-[60px] sm:h-[60px] bg-white rounded-full opacity-50 animate-ping;
+    @apply absolute left-1/2 top-1/2 w-[50px] h-[50px] sm:w-[60px] sm:h-[60px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-white opacity-60 animate-ping;
   }
   .vapi-mic-btn {
-    @apply relative w-[50px] h-[50px] sm:w-[60px] sm:h-[60px] cursor-pointer rounded-full flex items-center justify-center transition-all duration-300 border-0 bg-white;
+    @apply relative w-[50px] h-[50px] sm:w-[60px] sm:h-[60px] cursor-pointer rounded-full flex items-center justify-center transition-all duration-300 border-0;
 
     &:hover {
       transform: scale(1.05);
     }
     &:hover svg {
-      @apply text-[#aaa];
+      @apply opacity-85;
     }
     &:active {
       transform: scale(0.95);
@@ -433,10 +433,10 @@
     }
   }
   .vapi-mic-btn-active {
-    @apply bg-white;
+    @apply bg-[#212a3b] text-white;
   }
   .vapi-mic-btn-inactive {
-    @apply bg-white;
+    @apply bg-white text-[#212a3b];
   }
   .vapi-badge-ai {
     @apply inline-block bg-white px-3 py-2 rounded-[4px];
@@ -455,6 +455,9 @@
     @apply bg-gray-400;
   }
   .vapi-status-dot-connecting {
+    @apply bg-yellow-500 animate-pulse;
+  }
+  .vapi-status-dot-starting {
     @apply bg-yellow-500 animate-pulse;
   }
   .vapi-status-dot-listening {

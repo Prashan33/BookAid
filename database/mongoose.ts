@@ -7,7 +7,7 @@ declare global {
     }
 }
 
-let cached = global.mongooseCache || (global.mongooseCache = { conn: null, promise: null });
+const cached = global.mongooseCache || (global.mongooseCache = { conn: null, promise: null });
 
 export const connectToDatabase = async () => {
     if (cached.conn) return cached.conn;
@@ -22,6 +22,10 @@ export const connectToDatabase = async () => {
         throw new Error('Please provide a valid MongoDB connection string via MONGODB_URI, MONGODB_URL, MONGO_URL, or mongo_url');
     }
 
+    if (mongodbUri.startsWith('mongodb+srv://') && /mongodb\+srv:\/\/[^/]*[#?]/.test(mongodbUri)) {
+        throw new Error('Invalid MongoDB SRV URI: credentials appear to include unencoded special characters. URL-encode characters like #, @, :, and ? in the username/password.');
+    }
+
     if (!cached.promise) {
         cached.promise = mongoose.connect(mongodbUri, { bufferCommands: false });
     }
@@ -30,7 +34,7 @@ export const connectToDatabase = async () => {
         cached.conn = await cached.promise;
     } catch (e) {
         cached.promise = null;
-        console.error('MongoDB connection error. Please make sure MongoDB is running. ' + e);
+        console.error('MongoDB connection error. Check that the URI is valid and that special characters in credentials are URL-encoded. ' + e);
         throw e;
     }
 

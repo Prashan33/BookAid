@@ -5,6 +5,7 @@ import { connectToDatabase } from "@/database/mongoose";
 import {escapeRegex, generateSlug, serializeData} from "@/lib/utils";
 import Book from "@/database/models/book.model";
 import BookSegment from "@/database/models/book-segment.model";
+import mongoose from "mongoose";
 
 export const getAllBooks = async (search?: string) => {
     try {
@@ -108,7 +109,35 @@ export const createBook = async (data: CreateBook) => {
             };
         }
 
-        const book = await Book.create({...data, slug, totalSegments: 0});
+        const { getUserPlan } = await import("@/lib/subscription.server");
+        const { PLAN_LIMITS } = await import("@/lib/subscription-constants");
+        const { auth } = await import("@clerk/nextjs/server");
+
+        const { userId } = await auth();
+
+        if (!userId || userId !== data.clerkId) {
+            return {
+                success: false,
+                error: "Unauthorized",
+            };
+        }
+
+        const plan = await getUserPlan();
+        const limits = PLAN_LIMITS[plan];
+        const bookCount = await Book.countDocuments({ clerkId: userId });
+
+        if (bookCount >= limits.maxBooks) {
+            const { revalidatePath } = await import("next/cache");
+            revalidatePath("/");
+
+            return {
+                success: false,
+                error: `You have reached the maximum number of books allowed for your ${plan} plan (${limits.maxBooks}). Please upgrade to add more books.`,
+                isBillingError: true,
+            };
+        }
+
+        const book = await Book.create({...data, clerkId: userId, slug, totalSegments: 0});
 
         return {
             success: true,
@@ -154,5 +183,69 @@ export const saveBookSegments = async (bookId: string, clerkId: string, segments
             success: false,
             error: e,
         }
+    }
+}
+
+export const searchBookSegments = async (bookId: string, query: string, limit: number = 5) => {
+    try {
+        await connectToDatabase();
+
+        if (!mongoose.Types.ObjectId.isValid(bookId)) {
+            return {
+                success: false,
+                error: "Invalid book ID",
+                data: [],
+            };
+        }
+
+        const bookObjectId = new mongoose.Types.ObjectId(bookId);
+
+        let segments: Record<string, unknown>[] = [];
+
+        try {
+            segments = await BookSegment.find({
+                bookId: bookObjectId,
+                $text: { $search: query },
+            })
+                .select("_id bookId content segmentIndex pageNumber wordCount")
+                .sort({ score: { $meta: "textScore" } })
+                .limit(limit)
+                .lean();
+        } catch {
+            segments = [];
+        }
+
+        if (segments.length === 0) {
+            const keywords = query.split(/\s+/).filter((keyword) => keyword.length > 2);
+            const pattern = keywords.map(escapeRegex).join("|");
+
+            if (!pattern) {
+                return {
+                    success: true,
+                    data: [],
+                };
+            }
+
+            segments = await BookSegment.find({
+                bookId: bookObjectId,
+                content: { $regex: pattern, $options: "i" },
+            })
+                .select("_id bookId content segmentIndex pageNumber wordCount")
+                .sort({ segmentIndex: 1 })
+                .limit(limit)
+                .lean();
+        }
+
+        return {
+            success: true,
+            data: serializeData(segments),
+        };
+    } catch (error) {
+        console.error("Error searching segments:", error);
+        return {
+            success: false,
+            error: error instanceof Error ? error.message : String(error),
+            data: [],
+        };
     }
 }
