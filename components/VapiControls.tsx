@@ -11,18 +11,35 @@ import {useRouter} from "next/navigation";
 import {useEffect} from "react";
 
 const VapiControls = ({ book }: { book: IBook }) => {
-    const { status, isActive, isAiResponding, messages, currentMessage, currentUserMessage, duration, start, stop, clearError, limitError, isBillingError, maxDurationSeconds } = useVapi(book)
+    const {
+        status,
+        isActive,
+        isAiResponding,
+        messages,
+        currentMessage,
+        currentUserMessage,
+        duration,
+        start,
+        stop,
+        clearError,
+        limitError,
+        isBillingError,
+        shouldRedirectHome,
+        maxDurationSeconds,
+    } = useVapi(book)
     const router = useRouter();
 
     useEffect(() => {
         if (limitError) {
             toast.error(limitError);
-            if (isBillingError) {
+            if (shouldRedirectHome) {
+                router.push("/");
+            } else if (isBillingError) {
                 router.push("/subscriptions");
             }
             clearError();
         }
-    }, [isBillingError, limitError, router, clearError]);
+    }, [clearError, isBillingError, limitError, router, shouldRedirectHome]);
 
     const formatDuration = (seconds: number) => {
         const mins = Math.floor(seconds / 60);

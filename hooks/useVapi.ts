@@ -57,15 +57,18 @@ export const useVapi = (book: IBook) => {
   const [duration, setDuration] = useState(0);
   const [limitError, setLimitError] = useState<string | null>(null);
   const [isBillingError, setIsBillingError] = useState(false);
+  const [shouldRedirectHome, setShouldRedirectHome] = useState(false);
+  const [sessionMaxDurationSeconds, setSessionMaxDurationSeconds] = useState<number | null>(null);
 
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const startTimeRef = useRef<number | null>(null);
   const sessionIdRef = useRef<string | null>(null);
   const isStoppingRef = useRef(false);
 
-  const maxDurationSeconds = limits?.maxDurationPerSession
+  const fallbackMaxDurationSeconds = limits?.maxDurationPerSession
     ? limits.maxDurationPerSession * SECONDS_PER_MINUTE
     : 15 * SECONDS_PER_MINUTE;
+  const maxDurationSeconds = sessionMaxDurationSeconds ?? fallbackMaxDurationSeconds;
   const maxDurationRef = useLatestRef(maxDurationSeconds);
   const durationRef = useLatestRef(duration);
   const voice = book.persona || DEFAULT_VOICE;
@@ -94,7 +97,8 @@ export const useVapi = (book: IBook) => {
 
           if (nextDuration >= maxDurationRef.current) {
             setLimitError("You have reached the maximum session duration for your plan.");
-            setIsBillingError(true);
+            setIsBillingError(false);
+            setShouldRedirectHome(true);
             isStoppingRef.current = true;
             vapiClient.stop();
           }
@@ -130,6 +134,15 @@ export const useVapi = (book: IBook) => {
           setStatus("listening");
         }
       },
+      "call-start-success": () => {
+        if (!isStoppingRef.current) {
+          setStatus("listening");
+        }
+      },
+      "call-start-failed": (event: { error?: string }) => {
+        setStatus("idle");
+        setLimitError(event.error || "Failed to start voice session. Please try again.");
+      },
       message: (message: {
         type: string;
         role: string;
@@ -146,11 +159,17 @@ export const useVapi = (book: IBook) => {
         }
 
         if (message.role === "user" && message.transcriptType === "partial") {
+          if (!isStoppingRef.current) {
+            setStatus("listening");
+          }
           setCurrentUserMessage(message.transcript);
           return;
         }
 
         if (message.role === "assistant" && message.transcriptType === "partial") {
+          if (!isStoppingRef.current) {
+            setStatus("speaking");
+          }
           setCurrentMessage(message.transcript);
           return;
         }
@@ -158,6 +177,10 @@ export const useVapi = (book: IBook) => {
         if (message.transcriptType === "final") {
           if (message.role === "assistant") setCurrentMessage("");
           if (message.role === "user") setCurrentUserMessage("");
+
+          if (!isStoppingRef.current && message.role === "assistant") {
+            setStatus("listening");
+          }
 
           setMessages((prev) => {
             const isDuplicate = prev.some(
@@ -198,6 +221,7 @@ export const useVapi = (book: IBook) => {
         }
 
         startTimeRef.current = null;
+        isStoppingRef.current = false;
       },
     };
 
@@ -250,6 +274,7 @@ export const useVapi = (book: IBook) => {
 
     setLimitError(null);
     setIsBillingError(false);
+    setShouldRedirectHome(false);
     setStatus("connecting");
 
     try {
@@ -263,6 +288,9 @@ export const useVapi = (book: IBook) => {
       }
 
       sessionIdRef.current = result.sessionId || null;
+      setSessionMaxDurationSeconds(
+        (result.maxDurationMinutes ?? limits?.maxDurationPerSession ?? 15) * SECONDS_PER_MINUTE,
+      );
 
       const firstMessage = `Hey, good to meet you. Quick question before we dive in - have you actually read ${book.title} yet, or are we starting fresh?`;
 
@@ -311,7 +339,7 @@ export const useVapi = (book: IBook) => {
 
       setLimitError("Failed to start voice session. Check deployment env vars and microphone permissions, then try again.");
     }
-  }, [book._id, book.author, book.title, userId, voice]);
+  }, [book._id, book.author, book.title, limits?.maxDurationPerSession, userId, voice]);
 
   const stop = useCallback(() => {
     const vapiClient = getVapi();
@@ -327,6 +355,7 @@ export const useVapi = (book: IBook) => {
   const clearError = useCallback(() => {
     setLimitError(null);
     setIsBillingError(false);
+    setShouldRedirectHome(false);
   }, []);
 
   const isActive =
@@ -348,6 +377,7 @@ export const useVapi = (book: IBook) => {
     stop,
     limitError,
     isBillingError,
+    shouldRedirectHome,
     maxDurationSeconds,
     clearError,
   };
