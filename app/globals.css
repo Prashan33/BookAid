@@ -204,6 +204,19 @@
   .clerk-subscriptions {
     @apply py-18 min-h-screen max-w-7xl px-5 mx-auto w-full flex flex-col pb-12 items-center container;
   }
+  .subscriptions-page {
+    @apply flex flex-col gap-10 pb-16;
+  }
+  .subscriptions-hero {
+    @apply flex flex-col items-center gap-4 text-center pt-8;
+  }
+  .subscriptions-eyebrow {
+    @apply text-sm font-semibold uppercase tracking-[0.28em] text-[var(--color-brand)];
+  }
+  .subscriptions-disabled-state {
+    @apply mx-auto flex max-w-3xl flex-col items-center gap-4 rounded-[24px] border border-[var(--border-subtle)] bg-white px-6 py-10 text-center;
+    box-shadow: var(--shadow-soft);
+  }
   .page-title {
     @apply !text-3xl font-bold text-center;
   }
@@ -564,6 +577,17 @@
   }
   .library-empty-card {
     @apply bg-[var(--bg-secondary)] rounded-[14px] p-12 max-w-md mx-auto;
+  }
+  .clerk-pricing-container {
+    @apply w-full rounded-[28px] border border-[var(--border-subtle)] bg-[linear-gradient(180deg,rgba(255,246,229,0.72),rgba(255,255,255,0.98))] p-3 md:p-5;
+    box-shadow: var(--shadow-soft-lg);
+  }
+  .clerk-pricing-container [data-component-status="ready"] {
+    @apply w-full;
+  }
+  .clerk-pricing-container button,
+  .clerk-pricing-container a {
+    border-radius: 14px;
   }
 
   /* ===========================================

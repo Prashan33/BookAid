@@ -167,3 +167,21 @@ export const CLERK_AUTH_APPEARANCE_OVERRIDE = {
     footerActionLink: 'text-[#212a3b] hover:text-[#3d485e] text-base font-medium',
 };
 
+export const CLERK_PRICING_TABLE_APPEARANCE = {
+    variables: {
+        colorPrimary: '#663820',
+        colorText: '#212a3b',
+        colorTextSecondary: '#3d485e',
+        colorBackground: '#ffffff',
+        colorNeutral: '#f8f4e9',
+        colorInputBackground: '#fff6e5',
+        colorDanger: '#b42318',
+        borderRadius: '16px',
+        fontFamily: '"Avenir Next", "Segoe UI", Helvetica, Arial, sans-serif',
+    },
+    elements: {
+        card: 'shadow-[0_1px_3px_rgba(0,0,0,0.04),0_8px_24px_rgba(0,0,0,0.08)] border border-[rgba(33,42,59,0.12)]',
+        button: 'font-semibold',
+        badge: 'font-medium',
+    },
+};

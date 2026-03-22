@@ -20,6 +20,15 @@ You can start editing the page by modifying `app/page.tsx`. The page auto-update
 
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
+## Environment Notes
+
+The subscriptions page uses Clerk Billing's `<PricingTable />` component. To render it in a given environment:
+
+- Enable Billing for the application in the Clerk Dashboard.
+- After Billing is enabled in Clerk, set `NEXT_PUBLIC_CLERK_BILLING_ENABLED=true` in that environment.
+
+If Billing is not enabled in Clerk, the app will still show the subscriptions route, but Clerk will not have plans to display.
+
 ## Learn More
 
 To learn more about Next.js, take a look at the following resources:

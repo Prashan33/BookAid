@@ -2,11 +2,12 @@
 
 import { useAuth, useUser } from "@clerk/nextjs";
 
-import { PLAN_LIMITS, PLANS, type PlanType } from "@/lib/subscription-constants";
+import { PLAN_LIMITS, PLANS } from "@/lib/subscription-constants";
+import { getPlanFromHas } from "@/lib/subscription";
 
 export const useSubscription = () => {
   const { has, isLoaded: isAuthLoaded } = useAuth();
-  const { user, isLoaded: isUserLoaded } = useUser();
+  const { isLoaded: isUserLoaded } = useUser();
 
   const isLoaded = isAuthLoaded && isUserLoaded;
 
@@ -18,23 +19,7 @@ export const useSubscription = () => {
     };
   }
 
-  let plan: PlanType = PLANS.FREE;
-
-  if (has?.({ plan: "pro" })) {
-    plan = PLANS.PRO;
-  } else if (has?.({ plan: "standard" })) {
-    plan = PLANS.STANDARD;
-  } else {
-    const metadataPlan = (user?.publicMetadata?.plan || user?.publicMetadata?.billingPlan)
-      ?.toString()
-      .toLowerCase();
-
-    if (metadataPlan === "pro") {
-      plan = PLANS.PRO;
-    } else if (metadataPlan === "standard") {
-      plan = PLANS.STANDARD;
-    }
-  }
+  const plan = getPlanFromHas(has);
 
   return {
     plan,

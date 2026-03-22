@@ -1,11 +1,15 @@
 'use server';
 
+import { auth } from "@clerk/nextjs/server";
 import {CreateBook, TextSegment} from "@/types";
 import { connectToDatabase } from "@/database/mongoose";
 import {escapeRegex, generateSlug, serializeData} from "@/lib/utils";
 import Book from "@/database/models/book.model";
 import BookSegment from "@/database/models/book-segment.model";
 import mongoose from "mongoose";
+import { PLAN_DISPLAY_NAMES } from "@/lib/subscription-constants";
+import { getPlanLimitsFor } from "@/lib/subscription";
+import { getUserPlan } from "@/lib/subscription.server";
 
 export const getAllBooks = async (search?: string) => {
     try {
@@ -95,6 +99,15 @@ export const checkBookExists = async (title: string) => {
 
 export const createBook = async (data: CreateBook) => {
     try {
+        const { userId } = await auth();
+
+        if (!userId || userId !== data.clerkId) {
+            return {
+                success: false,
+                error: "Unauthorized",
+            };
+        }
+
         await connectToDatabase();
 
         const slug = generateSlug(data.title);
@@ -109,21 +122,8 @@ export const createBook = async (data: CreateBook) => {
             };
         }
 
-        const { getUserPlan } = await import("@/lib/subscription.server");
-        const { PLAN_LIMITS } = await import("@/lib/subscription-constants");
-        const { auth } = await import("@clerk/nextjs/server");
-
-        const { userId } = await auth();
-
-        if (!userId || userId !== data.clerkId) {
-            return {
-                success: false,
-                error: "Unauthorized",
-            };
-        }
-
         const plan = await getUserPlan();
-        const limits = PLAN_LIMITS[plan];
+        const limits = getPlanLimitsFor(plan);
         const bookCount = await Book.countDocuments({ clerkId: userId });
 
         if (bookCount >= limits.maxBooks) {
@@ -132,7 +132,7 @@ export const createBook = async (data: CreateBook) => {
 
             return {
                 success: false,
-                error: `You have reached the maximum number of books allowed for your ${plan} plan (${limits.maxBooks}). Please upgrade to add more books.`,
+                error: `You have reached the maximum number of books allowed for your ${PLAN_DISPLAY_NAMES[plan]} plan (${limits.maxBooks}). Please upgrade to add more books.`,
                 isBillingError: true,
             };
         }

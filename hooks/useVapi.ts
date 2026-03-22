@@ -241,6 +241,13 @@ export const useVapi = (book: IBook) => {
       return;
     }
 
+    if (!ASSISTANT_ID) {
+      setLimitError("NEXT_PUBLIC_ASSISTANT_ID is not set. Add it to your environment variables.");
+      setIsBillingError(false);
+      setStatus("idle");
+      return;
+    }
+
     setLimitError(null);
     setIsBillingError(false);
     setStatus("connecting");
@@ -279,7 +286,30 @@ export const useVapi = (book: IBook) => {
     } catch (error) {
       console.error("Failed to start call:", error);
       setStatus("idle");
-      setLimitError("Failed to start voice session. Please try again.");
+
+      const errorMessage = error instanceof Error ? error.message.toLowerCase() : "";
+      const errorName = error instanceof Error ? error.name : "";
+
+      if (
+        errorName === "NotAllowedError" ||
+        errorMessage.includes("permission") ||
+        errorMessage.includes("notallowederror")
+      ) {
+        setLimitError("Microphone access was blocked. Allow microphone permissions in your browser and try again.");
+        return;
+      }
+
+      if (errorMessage.includes("assistant")) {
+        setLimitError("The Vapi assistant failed to start. Check NEXT_PUBLIC_ASSISTANT_ID in your deployment settings.");
+        return;
+      }
+
+      if (errorMessage.includes("api key")) {
+        setLimitError("The Vapi client could not authenticate. Check NEXT_PUBLIC_VAPI_API_KEY in your deployment settings.");
+        return;
+      }
+
+      setLimitError("Failed to start voice session. Check deployment env vars and microphone permissions, then try again.");
     }
   }, [book._id, book.author, book.title, userId, voice]);
 

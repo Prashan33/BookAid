@@ -41,6 +41,7 @@ export interface IVoiceSession extends Document {
     startedAt: Date;
     endedAt?: Date;
     durationSeconds: number;
+    billingPeriodKey: string;
     billingPeriodStart: Date;
     createdAt: Date;
     updatedAt: Date;
