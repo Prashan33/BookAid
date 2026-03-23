@@ -16,9 +16,10 @@ export const getAllBooks = async (search?: string) => {
         await connectToDatabase();
 
         let query = {};
+        const normalizedSearch = search?.trim();
 
-        if (search) {
-            const escapedSearch = escapeRegex(search);
+        if (normalizedSearch) {
+            const escapedSearch = escapeRegex(normalizedSearch);
             const regex = new RegExp(escapedSearch, 'i');
             query = {
                 $or: [

@@ -486,6 +486,34 @@
     @apply text-sm font-medium text-[#212a3b];
     font-family: 'IBM Plex Serif', serif;
   }
+  .vapi-error-panel {
+    @apply mb-4 rounded-[14px] border border-[#f0c9b2] bg-[#fff6f1] p-4 text-[#7a2e12];
+  }
+  .vapi-error-header {
+    @apply mb-2 flex items-center gap-2;
+  }
+  .vapi-error-title {
+    @apply text-sm font-bold uppercase tracking-[0.08em];
+  }
+  .vapi-error-message {
+    @apply text-sm font-semibold leading-6;
+  }
+  .vapi-error-hint {
+    @apply mt-1 text-sm leading-6 text-[#8f4b31];
+  }
+  .vapi-error-actions {
+    @apply mt-3 flex items-center gap-3;
+  }
+  .vapi-error-action {
+    @apply rounded-full border border-[#d68b68] bg-white px-4 py-2 text-sm font-semibold text-[#7a2e12] transition-colors;
+
+    &:hover {
+      @apply bg-[#fff0e7];
+    }
+  }
+  .vapi-error-link {
+    @apply text-sm font-semibold text-[#7a2e12] underline underline-offset-4;
+  }
   .vapi-stat-box {
     @apply bg-white rounded-[10px] px-2.5 py-5 min-w-[225px] text-center;
   }

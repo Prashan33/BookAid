@@ -56,6 +56,7 @@ export const useVapi = (book: IBook) => {
   const [currentUserMessage, setCurrentUserMessage] = useState("");
   const [duration, setDuration] = useState(0);
   const [limitError, setLimitError] = useState<string | null>(null);
+  const [displayError, setDisplayError] = useState<string | null>(null);
   const [isBillingError, setIsBillingError] = useState(false);
   const [shouldRedirectHome, setShouldRedirectHome] = useState(false);
   const [sessionMaxDurationSeconds, setSessionMaxDurationSeconds] = useState<number | null>(null);
@@ -72,6 +73,11 @@ export const useVapi = (book: IBook) => {
   const maxDurationRef = useLatestRef(maxDurationSeconds);
   const durationRef = useLatestRef(duration);
   const voice = book.persona || DEFAULT_VOICE;
+
+  const showError = useCallback((message: string) => {
+    setLimitError(message);
+    setDisplayError(message);
+  }, []);
 
   useEffect(() => {
     const vapiClient = getVapi();
@@ -96,7 +102,7 @@ export const useVapi = (book: IBook) => {
           setDuration(nextDuration);
 
           if (nextDuration >= maxDurationRef.current) {
-            setLimitError("You have reached the maximum session duration for your plan.");
+            showError("You have reached the maximum session duration for your plan.");
             setIsBillingError(false);
             setShouldRedirectHome(true);
             isStoppingRef.current = true;
@@ -141,7 +147,7 @@ export const useVapi = (book: IBook) => {
       },
       "call-start-failed": (event: { error?: string }) => {
         setStatus("idle");
-        setLimitError(event.error || "Failed to start voice session. Please try again.");
+        showError(event.error || "Failed to start voice session. Please try again.");
       },
       message: (message: {
         type: string;
@@ -213,11 +219,11 @@ export const useVapi = (book: IBook) => {
 
         const errorMessage = error.message?.toLowerCase() || "";
         if (errorMessage.includes("timeout") || errorMessage.includes("silence")) {
-          setLimitError("Session ended due to inactivity. Click the mic to start again.");
+          showError("Session ended due to inactivity. Click the mic to start again.");
         } else if (errorMessage.includes("network") || errorMessage.includes("connection")) {
-          setLimitError("Connection lost. Please check your internet and try again.");
+          showError("Connection lost. Please check your internet and try again.");
         } else {
-          setLimitError("Session ended unexpectedly. Click the mic to start again.");
+          showError("Session ended unexpectedly. Click the mic to start again.");
         }
 
         startTimeRef.current = null;
@@ -249,30 +255,31 @@ export const useVapi = (book: IBook) => {
         clearInterval(timerRef.current);
       }
     };
-  }, [durationRef, maxDurationRef]);
+  }, [durationRef, maxDurationRef, showError]);
 
   const start = useCallback(async () => {
     if (!userId) {
-      setLimitError("Please sign in to start a voice session.");
+      showError("Please sign in to start a voice session.");
       return;
     }
 
     const vapiClient = getVapi();
     if (!vapiClient) {
-      setLimitError("NEXT_PUBLIC_VAPI_API_KEY is not set. Add it to your environment variables.");
+      showError("NEXT_PUBLIC_VAPI_API_KEY is not set. Add it to your environment variables.");
       setIsBillingError(false);
       setStatus("idle");
       return;
     }
 
     if (!ASSISTANT_ID) {
-      setLimitError("NEXT_PUBLIC_ASSISTANT_ID is not set. Add it to your environment variables.");
+      showError("NEXT_PUBLIC_ASSISTANT_ID is not set. Add it to your environment variables.");
       setIsBillingError(false);
       setStatus("idle");
       return;
     }
 
     setLimitError(null);
+    setDisplayError(null);
     setIsBillingError(false);
     setShouldRedirectHome(false);
     setStatus("connecting");
@@ -281,7 +288,7 @@ export const useVapi = (book: IBook) => {
       const result = await startVoiceSession(userId, book._id);
 
       if (!result.success) {
-        setLimitError(result.error || "Session limit reached. Please upgrade your plan.");
+        showError(result.error || "Session limit reached. Please upgrade your plan.");
         setIsBillingError(!!result.isBillingError);
         setStatus("idle");
         return;
@@ -323,23 +330,23 @@ export const useVapi = (book: IBook) => {
         errorMessage.includes("permission") ||
         errorMessage.includes("notallowederror")
       ) {
-        setLimitError("Microphone access was blocked. Allow microphone permissions in your browser and try again.");
+        showError("Microphone access was blocked. Allow microphone permissions in your browser and try again.");
         return;
       }
 
       if (errorMessage.includes("assistant")) {
-        setLimitError("The Vapi assistant failed to start. Check NEXT_PUBLIC_ASSISTANT_ID in your deployment settings.");
+        showError("The Vapi assistant failed to start. Check NEXT_PUBLIC_ASSISTANT_ID in your deployment settings.");
         return;
       }
 
       if (errorMessage.includes("api key")) {
-        setLimitError("The Vapi client could not authenticate. Check NEXT_PUBLIC_VAPI_API_KEY in your deployment settings.");
+        showError("The Vapi client could not authenticate. Check NEXT_PUBLIC_VAPI_API_KEY in your deployment settings.");
         return;
       }
 
-      setLimitError("Failed to start voice session. Check deployment env vars and microphone permissions, then try again.");
+      showError("Failed to start voice session. Check deployment env vars and microphone permissions, then try again.");
     }
-  }, [book._id, book.author, book.title, limits?.maxDurationPerSession, userId, voice]);
+  }, [book._id, book.author, book.title, limits?.maxDurationPerSession, showError, userId, voice]);
 
   const stop = useCallback(() => {
     const vapiClient = getVapi();
@@ -356,6 +363,10 @@ export const useVapi = (book: IBook) => {
     setLimitError(null);
     setIsBillingError(false);
     setShouldRedirectHome(false);
+  }, []);
+
+  const dismissDisplayError = useCallback(() => {
+    setDisplayError(null);
   }, []);
 
   const isActive =
@@ -376,10 +387,12 @@ export const useVapi = (book: IBook) => {
     start,
     stop,
     limitError,
+    displayError,
     isBillingError,
     shouldRedirectHome,
     maxDurationSeconds,
     clearError,
+    dismissDisplayError,
   };
 };
 
