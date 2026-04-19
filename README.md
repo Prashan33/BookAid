@@ -258,7 +258,7 @@ npm start
 
 Built as a portfolio project to demonstrate full-stack engineering across real-time voice AI, retrieval, authentication, billing, and modern Next.js patterns.
 
-- Email: prasuadhikari33@gmail.com
+- Email: prashanadhikari@gmail.com
 
 ---
 
