@@ -254,7 +254,7 @@ npm start
 
 ## Author
 
-**Prashan Adhikari**
+*Prashan Adhikari*
 
 Built as a portfolio project to demonstrate full-stack engineering across real-time voice AI, retrieval, authentication, billing, and modern Next.js patterns.
 
