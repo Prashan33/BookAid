@@ -148,16 +148,6 @@ bookaid/
 
 ---
 
-## Screenshots / Demo
-
-> _Placeholder — drop screenshots or a GIF of the upload flow and an active voice session here._
-
-- **Library** — `/`
-- **Upload** — `/books/new`
-- **Voice session** — `/books/[slug]`
-- **Pricing** — `/subscriptions`
-
----
 
 ## Installation & Setup
 
