@@ -41,9 +41,23 @@ export interface IVoiceSession extends Document {
     startedAt: Date;
     endedAt?: Date;
     durationSeconds: number;
+    billingPeriodKey: string;
     billingPeriodStart: Date;
     createdAt: Date;
     updatedAt: Date;
+}
+
+export interface StartSessionResult {
+    success: boolean;
+    sessionId?: string;
+    maxDurationMinutes?: number;
+    error?: string;
+    isBillingError?: boolean;
+}
+
+export interface EndSessionResult {
+    success: boolean;
+    error?: string;
 }
 
 // ============================================

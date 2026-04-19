@@ -204,6 +204,19 @@
   .clerk-subscriptions {
     @apply py-18 min-h-screen max-w-7xl px-5 mx-auto w-full flex flex-col pb-12 items-center container;
   }
+  .subscriptions-page {
+    @apply flex flex-col gap-10 pb-16;
+  }
+  .subscriptions-hero {
+    @apply flex flex-col items-center gap-4 text-center pt-8;
+  }
+  .subscriptions-eyebrow {
+    @apply text-sm font-semibold uppercase tracking-[0.28em] text-[var(--color-brand)];
+  }
+  .subscriptions-disabled-state {
+    @apply mx-auto flex max-w-3xl flex-col items-center gap-4 rounded-[24px] border border-[var(--border-subtle)] bg-white px-6 py-10 text-center;
+    box-shadow: var(--shadow-soft);
+  }
   .page-title {
     @apply !text-3xl font-bold text-center;
   }
@@ -414,16 +427,16 @@
     @apply absolute -bottom-1 -right-1 sm:-bottom-2 sm:-right-2;
   }
   .vapi-pulse-ring {
-    @apply absolute inset-0 w-[50px] h-[50px] sm:w-[60px] sm:h-[60px] bg-white rounded-full opacity-50 animate-ping;
+    @apply absolute left-1/2 top-1/2 w-[50px] h-[50px] sm:w-[60px] sm:h-[60px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-white opacity-60 animate-ping;
   }
   .vapi-mic-btn {
-    @apply relative w-[50px] h-[50px] sm:w-[60px] sm:h-[60px] cursor-pointer rounded-full flex items-center justify-center transition-all duration-300 border-0 bg-white;
+    @apply relative w-[50px] h-[50px] sm:w-[60px] sm:h-[60px] cursor-pointer rounded-full flex items-center justify-center transition-all duration-300 border-0;
 
     &:hover {
       transform: scale(1.05);
     }
     &:hover svg {
-      @apply text-[#aaa];
+      @apply opacity-85;
     }
     &:active {
       transform: scale(0.95);
@@ -433,10 +446,10 @@
     }
   }
   .vapi-mic-btn-active {
-    @apply bg-white;
+    @apply bg-[#212a3b] text-white;
   }
   .vapi-mic-btn-inactive {
-    @apply bg-white;
+    @apply bg-white text-[#212a3b];
   }
   .vapi-badge-ai {
     @apply inline-block bg-white px-3 py-2 rounded-[4px];
@@ -457,6 +470,9 @@
   .vapi-status-dot-connecting {
     @apply bg-yellow-500 animate-pulse;
   }
+  .vapi-status-dot-starting {
+    @apply bg-yellow-500 animate-pulse;
+  }
   .vapi-status-dot-listening {
     @apply bg-green-500 animate-pulse;
   }
@@ -469,6 +485,34 @@
   .vapi-status-text {
     @apply text-sm font-medium text-[#212a3b];
     font-family: 'IBM Plex Serif', serif;
+  }
+  .vapi-error-panel {
+    @apply mb-4 rounded-[14px] border border-[#f0c9b2] bg-[#fff6f1] p-4 text-[#7a2e12];
+  }
+  .vapi-error-header {
+    @apply mb-2 flex items-center gap-2;
+  }
+  .vapi-error-title {
+    @apply text-sm font-bold uppercase tracking-[0.08em];
+  }
+  .vapi-error-message {
+    @apply text-sm font-semibold leading-6;
+  }
+  .vapi-error-hint {
+    @apply mt-1 text-sm leading-6 text-[#8f4b31];
+  }
+  .vapi-error-actions {
+    @apply mt-3 flex items-center gap-3;
+  }
+  .vapi-error-action {
+    @apply rounded-full border border-[#d68b68] bg-white px-4 py-2 text-sm font-semibold text-[#7a2e12] transition-colors;
+
+    &:hover {
+      @apply bg-[#fff0e7];
+    }
+  }
+  .vapi-error-link {
+    @apply text-sm font-semibold text-[#7a2e12] underline underline-offset-4;
   }
   .vapi-stat-box {
     @apply bg-white rounded-[10px] px-2.5 py-5 min-w-[225px] text-center;
@@ -561,6 +605,17 @@
   }
   .library-empty-card {
     @apply bg-[var(--bg-secondary)] rounded-[14px] p-12 max-w-md mx-auto;
+  }
+  .clerk-pricing-container {
+    @apply w-full rounded-[28px] border border-[var(--border-subtle)] bg-[linear-gradient(180deg,rgba(255,246,229,0.72),rgba(255,255,255,0.98))] p-3 md:p-5;
+    box-shadow: var(--shadow-soft-lg);
+  }
+  .clerk-pricing-container [data-component-status="ready"] {
+    @apply w-full;
+  }
+  .clerk-pricing-container button,
+  .clerk-pricing-container a {
+    border-radius: 14px;
   }
 
   /* ===========================================

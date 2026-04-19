@@ -7,9 +7,11 @@ const VoiceSessionSchema = new Schema<IVoiceSession>({
     startedAt: { type: Date, required: true },
     endedAt: { type: Date },
     durationSeconds: { type: Number, required: true },
+    billingPeriodKey: { type: String, required: true },
     billingPeriodStart: { type: Date, required: true },
 }, { timestamps: true });
 
+VoiceSessionSchema.index({ clerkId: 1, billingPeriodKey: 1 });
 VoiceSessionSchema.index({ clerkId: 1, billingPeriodStart: 1 });
 
 const VoiceSession = models.VoiceSession || model<IVoiceSession>("VoiceSession", VoiceSessionSchema);
